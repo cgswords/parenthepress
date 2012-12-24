@@ -61,7 +61,7 @@ div#post {
 h2 {
 	margin: 0px;
 	color: #382507;
-	font-size: 28px;
+	font-size: 26px;
 	font-weight: normal;
 }
 
@@ -76,7 +76,7 @@ h4 {
 	font-weight: normal;
 	font-style: italic;
   position: relative;
-  top: -2px;
+  /*top: -2px;*/
   left: 5px;
 }
 
@@ -86,10 +86,6 @@ hr {
 	width: 500px;
 	border: 1px solid #FFFFFF;
 	border-top: 1px solid #382507;
-}
-
-div#content {
-	text-align: left;
 }
 
 div#content {
@@ -114,8 +110,13 @@ div#footer {
 }
 
 div#quote {
-  font-size: 28px;
+  font-size: 24px;
   font-style: italic;
+  font-weight: lighter;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  margin-bottom: 5px;
+  color: #310907;
 }
 
 img {
@@ -141,3 +142,21 @@ li {
   padding-bottom: 0px;
   padding-top: 0px;
 }
+
+div#nav {
+  padding-top: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #310907;
+	width: 500px;
+	font-size: 11px;
+	text-align: center;
+}
+
+a#topnav {
+	color: #88542C;
+	text-decoration: none;
+	font-size: 23px;
+}
+
+
