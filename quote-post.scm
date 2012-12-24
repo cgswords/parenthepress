@@ -21,16 +21,15 @@
         "<div id=\"quote\">\n"
         my-quote
         "\n</div>\n"
-        "&mdash;<i>"
+        "&mdash;"
         source
-        "</i>\n\n")))
+        "<br /><br />\n\n")))
 
-(trace-define parse-quote-post
+(define parse-quote-post
   (lambda (post)
     (let ((my-quote (extract-tag 'quote post))
           (source (extract-tag 'source post))
-          (date (extract-date post))
-          (tags (extract-tags post)))
+          (date (extract-date post)))
       (string-append
         (make-content-div (quote-body my-quote source))
         "<div align=\"left\">"

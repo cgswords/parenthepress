@@ -27,8 +27,7 @@
                        '(#\( #\newline #\space))
                      #\newline
                      html-break)))
-           (title (extract-title post))
-           (tags  (extract-tags post)))
+           (title (extract-title post)))
       (string-append
         (make-title-and-date title date)
         (make-content-div text)

@@ -21,8 +21,7 @@
     (let* ((date  (extract-date post))
            (title (extract-title post))
            (link  (extract-tag 'link post))
-           (desc  (extract-tag 'desc post))
-           (tags  (extract-tags post)))
+           (desc  (extract-tag 'desc post)))
       (string-append
         (make-content-div (link-body title link desc))
         "<div align=\"left\">"

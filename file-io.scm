@@ -2,10 +2,12 @@
 ;; Write a file, overwriting it if it exists.
 (define write-file
   (lambda (file out)
+    (printf "Writing file for post: ~s~n" file)
     (if (file-exists? file) (delete-file file))
     (call-with-output-file file
       (lambda (p)
-        (display out p)))))
+        (display out p)))
+    (string-append "Successfully wrote " file)))
 
 ;; Reads a file in as a string (actually a list of chars).
 (define parse-file-as-string
@@ -25,7 +27,7 @@
         (split-on-parens 
           (parse-file-as-string file))))))
 
-(define extract-tags
+(define extract-page-tags
   (lambda (ls)
     (map convert-string-to-symbol (split-on #\space (get-tag 'tags ls)))))
 
@@ -44,7 +46,6 @@
            (title (remove-leading-symbols title '(#\( #\newline #\space)))
            (title (list->string title)))
       title)))
-
 
 (define extract-type
   (lambda (ls)

@@ -23,7 +23,22 @@
 (define blog-desc
   "Cameron Swords is a Ph.D.-track graduate student at Indiana University, keeping this blog to document his life as he pursues his degree. More academic information can be found <a href=\"http://www.cs.indiana.edu/~cswords/\">here</a>.")
 
-(define posts-per-page 5)
+(define posts-per-page 10)
+
+(define make-navigation
+  (lambda (ls)
+    (cond
+      [(null? ls) ""]
+      [(null? (cdr ls))
+        (string-append
+          "<a href=\"" (cdar ls)
+          "\" id=\"topnav\">" (caar ls) "</a>")]
+      [else
+        (string-append
+          "<a href=\"" (cdar ls)
+          "\" id=\"topnav\">" (caar ls) "</a>"
+          " <i style=\"font-size: 28px; padding-left: 5px; padding-right: 5px;\">|</i> "
+          (make-navigation (cdr ls)))])))
 
 (define preamble
   (string-append
@@ -37,7 +52,12 @@
     "<body>\n"
     "<div align=\"center\">\n"
     banner
-    "<br />\n\n"))
+    "<div id=\"nav\">\n\n"
+    (make-navigation '(("Latest" . "index.html") 
+                       ("Academic" . "http://www.cs.indiana.edu/~cswords/")
+                       ("Github" . "http://github.com/cgswords/")))
+    "\n\n"
+    "</div>"))
 
 (define postamble
   (string-append
@@ -63,6 +83,13 @@
 ;; +-|   Returns #t if the first argument occurs in the second, else #f.    |-+
 ;; +-+----------------------------------------------------------------------+-+
 ;; +--------------------------------------------------------------------------+
+
+(define union
+  (lambda (ls1 ls2)
+    (cond
+      [(null? ls1) ls2]
+      [(memq (car ls1) ls2) (union (cdr ls1) ls2)]
+      [else (cons (car ls1) (union (cdr ls1) ls2))])))
 
 (define assqd
   (lambda (x ls)
@@ -190,29 +217,42 @@
     ".html"))
 
 
-(trace-define build-post-body
+(define build-post-body
   (lambda (post)
     (let ((type (extract-type post)))
       ((assqd type post-types) post))))
-     
-(trace-define build-post
-  (lambda (post link)
-    (string-append
-      "<div id=\"post\">\n\n"
-      (build-post-body post)
-      "<div id=\"tags\">"
-      "..."
-      "<a href=\""
-      link
-      "\">Permalink</a> "
-      "</div>"
-      "\n\n</div>\n\n<hr />\n")))
+    
+(define build-tag-links
+  (lambda (tags)
+    (cond
+      [(null? tags) ""]
+      [else 
+        (let ((tag-str (symbol->string (car tags))))
+          (string-append
+            "<a href=\"" tag-str "-tag-page.html\">"
+            tag-str "</a> "
+            (build-tag-links (cdr tags))))])))
 
-(trace-define build-posts
+(define build-post
+  (lambda (post link)
+    (printf "Building page ~s~n" link)
+    (let ((tags (extract-page-tags post)))
+      (string-append
+        "<div id=\"post\">\n\n"
+        (build-post-body post)
+        "<div id=\"tags\">"
+        "Tags: "
+        (build-tag-links tags)
+        " | <a href=\""
+        "\">Permalink</a> "
+        "</div>"
+        "\n\n</div>\n\n<hr />\n"))))
+
+(define build-posts
   (lambda (posts)
     (map (lambda (x) (build-post (cdr x) (car x))) posts)))
 
-(trace-define generate-post-page
+(define generate-post-page
   (lambda (post)
     (string-append
       preamble
@@ -256,16 +296,16 @@
 (define sort-posts
   (lambda (x) (sort post-sort x)))
 
-(trace-define page-file-names
+(define page-file-names
   (lambda (n)
     (cond
       [(< n 2) "index.html"]
       [else (string-append "page" (number->string n) ".html")])))
 
-(trace-define generate-pages
+(define generate-pages
   (lambda (posts len index max-index)
     (cond
-      [(< len posts-per-page) `((,(page-file-names index) . 
+      [(<= len posts-per-page) `((,(page-file-names index) . 
                                  ,(generate-posts-page (apply string-append posts) index max-index)))]
       [else (cons 
               (cons (page-file-names index) 
@@ -273,16 +313,43 @@
                       (apply string-append (list-head posts posts-per-page)) index max-index))
               (generate-pages (list-tail posts posts-per-page) (- len posts-per-page) (add1 index) max-index))])))
 
-(trace-define (generate-posts)
+(define get-page-tags
+  (lambda (ls)
+    (let ((posts (map car ls)))
+      (fold-left union '() (map extract-page-tags (map cdr posts))))))
+
+(define generate-tag-page
+  (lambda (ls tags)
+    (cond
+      [(null? tags) '()]
+      [else   
+        (let* ((tag (car tags))
+               (posts (filter (lambda (x) (memq tag (car x))) ls)))
+          (cons 
+            `(,(string-append (symbol->string tag) "-tag-page.html")
+              ,(apply string-append (map cddr posts)))
+            (generate-tag-page ls (cdr tags))))])))
+
+(define generate-tag-pages
+  (lambda (ls tags)
+    (let* ((page-tag (map (lambda (x) (extract-page-tags (cdar x))) ls))
+           (ls (zip page-tag ls)))
+      (generate-tag-page ls tags))))
+
+(define (generate-posts)
   (let* ((posts (read-posts))
          (posts (sort-posts posts))
          (post-bodies (map cdr posts))
          (post-file-names (map build-file-name (map car posts)))
          (post-bodies (build-posts (zip post-file-names post-bodies)))
+         (tags (get-page-tags (zip posts post-bodies)))
+         (tag-pages (generate-tag-pages (zip posts post-bodies) tags))
          (post-pages (map generate-post-page post-bodies)))
-    (let ((output (append (zip post-file-names post-pages) 
+    (let ((output (append 
+                    (zip post-file-names post-pages)
+                    (map (lambda (x) (cons (car x) (generate-post-page (cadr x)))) tag-pages)
                     (let ((len (length post-bodies)))
-                    (generate-pages post-bodies len 1 (ceiling (/ len posts-per-page)))))))
+                      (generate-pages post-bodies len 1 (ceiling (/ len posts-per-page)))))))
       (map (lambda (x) (write-file (car x) (cdr x))) output))))
 
 ;; +--------------------------------------------------------------------------+

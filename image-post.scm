@@ -17,8 +17,7 @@
 (define parse-image-post
   (lambda (post) 
     (let* ((date (extract-date post))
-           (image (list->string (cdr (assq 'image post))))
-           (tags  (extract-tags post)))
+           (image (list->string (cdr (assq 'image post)))))
       (string-append
         (make-content-div (picture-body image))
         "<div align=\"left\">"
@@ -29,7 +28,7 @@
 (define picture-body
   (lambda (img)
     (string-append 
-        "<div id=\"image\"><a href=\"imgs/" 
+        "<div id=\"image\"><a href=\"img/" 
         img
         "\"> <img src=\"img/"
         img
