@@ -244,6 +244,7 @@
         "Tags: "
         (build-tag-links tags)
         " | <a href=\""
+        link
         "\">Permalink</a> "
         "</div>"
         "\n\n</div>\n\n<hr />\n"))))
