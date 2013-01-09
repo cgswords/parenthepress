@@ -17,16 +17,20 @@
 (define html-break
     (string->list "\n<br />\n"))
 
+(define run-markdown
+  (lambda (str)
+    (let ((str (write-file "tmp.text" str)))
+      (system "perl Markdown.pl tmp.text > out")
+      (list->string (parse-file-as-string "out")))))
+
 (define parse-text-post
   (lambda (post) 
     (let* ((date (extract-date post))
            (text (list->string 
-                   (replace 
-                     (remove-leading-symbols 
-                       (get-tag 'text post)
-                       '(#\( #\newline #\space))
-                     #\newline
-                     html-break)))
+                   (remove-leading-symbols 
+                     (get-tag 'text post)
+                     '(#\( #\newline #\space))))
+           (text (run-markdown text))
            (title (extract-title post)))
       (string-append
         (make-title-and-date title date)
