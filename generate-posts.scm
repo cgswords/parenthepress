@@ -8,63 +8,9 @@
 ;; +--------------------------------------------------------------------------+
 (load "file-io.scm")
 (load "string-parsing.scm")
+(load "settings.scm")
 
 (define post-types '())
-(define blog-title "Bit | Hacker")
-(define banner
-  (string-append
-    "<div id=\"title\">\n"
-    "<div id=\"titleinner\">\n"
-    "<h1>BIT <b id=\"color\">|</b> HACKER</h1>\n"
-    "The long road to the Ph.D.\n"
-    "</div>\n"
-    "</div>\n\n"))
-
-(define blog-desc
-  "Cameron Swords is a Ph.D.-track graduate student at Indiana University, keeping this blog to document his life as he pursues his degree. More academic information can be found <a href=\"http://www.cs.indiana.edu/~cswords/\">here</a>.")
-
-(define posts-per-page 10)
-
-(define make-navigation
-  (lambda (ls)
-    (cond
-      [(null? ls) ""]
-      [(null? (cdr ls))
-        (string-append
-          "<a href=\"" (cdar ls)
-          "\" id=\"topnav\">" (caar ls) "</a>")]
-      [else
-        (string-append
-          "<a href=\"" (cdar ls)
-          "\" id=\"topnav\">" (caar ls) "</a>"
-          " <i style=\"font-size: 28px; padding-left: 5px; padding-right: 5px;\">|</i> "
-          (make-navigation (cdr ls)))])))
-
-(define preamble
-  (string-append
-    "<html>\n"
-    "<head>\n"
-    "<title>"
-    blog-title
-    "</title>\n"
-    "<link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\" />\n"
-    "</head>\n"
-    "<body>\n"
-    "<div align=\"center\">\n"
-    banner
-    "<div id=\"nav\">\n\n"
-    (make-navigation '(("Latest" . "index.html") 
-                       ("Academic" . "http://www.cs.indiana.edu/~cswords/")
-                       ("Github" . "http://github.com/cgswords/")))
-    "\n\n"
-    "</div>"))
-
-(define postamble
-  (string-append
-    "\n<br /><br />\n\n"
-    "<div id=\"footer\">\n\n"
-    blog-desc
-    "\n<br /><br />\n</div>\n</div>\n</body>\n</html>"))
 
 ;; +--------------------------------------------------------------------------+
 ;; +-+----------------------------------------------------------------------+-+
@@ -177,45 +123,11 @@
 ;; +-+----------------------------------------------------------------------+-+
 ;; +--------------------------------------------------------------------------+
 
-;; Take a string body and produces a content div
-(define make-content-div
-  (lambda (b)
-    (string-append
-      "<div id=\"content\">\n"
-      b
-      "\n</div>\n\n")))
-
-;; Produces the title, correctly formatted
-(define make-title
-  (lambda (title)
-    (string-append
-      "<h2>"
-      title
-      "</h2>\n")))
-
-;; Parses a date and returns a string
-(define parse-date
-  (lambda (date)
-    (string-append
-      "<h4>"
-      (date-and-time date)
-      "</h4>\n")))
-
-;; Builds a title/date div for a post
-(define make-title-and-date
-  (lambda (title date)
-    (string-append
-      "<div align=\"left\">\n"
-      (make-title title)
-      (parse-date date)
-      "</div>\n\n<br />\n\n")))
-
 (define (build-file-name filename)
   (string-append 
     ;;"pages/"
     (substring filename 0 (- (string-length filename) 5))
     ".html"))
-
 
 (define build-post-body
   (lambda (post)
@@ -358,3 +270,6 @@
 ;; +-|----------------------------------------------------------------------|-+
 ;; +-+----------------------------------------------------------------------+-+
 ;; +--------------------------------------------------------------------------+
+
+(generate-posts)
+(exit)

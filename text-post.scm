@@ -23,6 +23,14 @@
       (system "perl Markdown.pl tmp.text > out")
       (list->string (parse-file-as-string "out")))))
 
+(define make-title-and-date
+  (lambda (title date)
+    (string-append
+      "<div align=\"left\">\n"
+      (make-title title)
+      (parse-date date)
+      "</div>\n\n<br />\n\n")))
+
 (define parse-text-post
   (lambda (post) 
     (let* ((date (extract-date post))
