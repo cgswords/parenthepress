@@ -21,7 +21,8 @@ Posts are structured as s-exprs. To add a post, call it `*.post` and add it to `
 ## Structure
 
 - `posts/` stores some posts
-- `template` was for my own reference; don't look at it
+- `img/` stores blog images
+
 
 The preamble and postamble defined in `generate-posts.scm` determine how the pages look (along with `index.css`).
 
